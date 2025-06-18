@@ -14,7 +14,7 @@ export const UserInfo = () => {
 
     return (
         <div className="user-info">
-            <span>Zalogowany jako: {user.firstName} {user.lastName}</span>
+            <span>Zalogowany jako: {user.firstName} {user.lastName} ({user.role})</span>
         </div>
     );
 };

@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import { ProjectsPage } from "./pages/ProjectsPage";
 import { StoriesPage } from "./pages/StoriesPage";
+import { TasksPage } from "./pages/TasksPage";
 import './App.css';
 
 function App() {
@@ -14,11 +15,15 @@ function App() {
           <NavLink to="/stories" className={({ isActive }) => isActive ? 'active' : ''}>
             Historyjki
           </NavLink>
+          <NavLink to="/tasks" className={({ isActive }) => isActive ? 'active' : ''}>
+            Zadania
+          </NavLink>
         </nav>
         
         <Routes>
           <Route path="/" element={<ProjectsPage />} />
           <Route path="/stories" element={<StoriesPage />} />
+          <Route path="/tasks" element={<TasksPage />} />
         </Routes>
       </div>
     </Router>
