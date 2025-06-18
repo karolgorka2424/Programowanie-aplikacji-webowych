@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Project } from "../models/Project";
-import localStorageService from "../services/localStorage.services";
+import localStorageService from "../services/localStorage.service.ts";
 import { ProjectList } from "../components/ProjectList";
 import ProjectForm from "../components/ProjectForm";
 
