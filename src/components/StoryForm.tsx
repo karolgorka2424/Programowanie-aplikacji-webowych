@@ -15,7 +15,7 @@ export const StoryForm: React.FC<StoryFormProps> = ({ onSubmit, initialStory, on
     const [priority, setPriority] = useState<Priority>(initialStory?.priority || 'medium');
     const [state, setState] = useState<StoryState>(initialStory?.state || 'todo');
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
         const activeProjectId = ActiveProjectService.getActiveProjectId();
@@ -24,7 +24,11 @@ export const StoryForm: React.FC<StoryFormProps> = ({ onSubmit, initialStory, on
             return;
         }
 
-        const currentUser = UserService.getCurrentUser();
+        const currentUser = await UserService.getCurrentUser();
+        if (!currentUser) {
+            alert('Nie można pobrać danych użytkownika!');
+            return;
+        }
         
         onSubmit({
             name,
