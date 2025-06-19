@@ -1,16 +1,15 @@
 import { Project } from "../models/Project";
 import { ProjectItem } from "./ProjectItem";
+
 interface ProjectListProps {
     projects: Project[];
     onEdit: (project: Project) => void;
     onDelete: (id: string) => void;
 }
+
 export const ProjectList = ({ projects, onEdit, onDelete }: ProjectListProps) => {
-    if (projects.length === 0) {
-        return <p>No projects available</p>;
-    }
     return (
-        <div className="project-list">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {projects.map((project) => (
                 <ProjectItem
                     key={project.id}
@@ -21,4 +20,4 @@ export const ProjectList = ({ projects, onEdit, onDelete }: ProjectListProps) =>
             ))}
         </div>
     );
-}
+};
