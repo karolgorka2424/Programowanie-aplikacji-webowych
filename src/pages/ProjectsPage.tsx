@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Project } from "../models/Project";
-import localStorageService from "../services/localStorage.service";
+import ProjectService from "../services/project.service"; // Zaktualizowany serwis
 import { ProjectList } from "../components/ProjectList";
 import ProjectForm from "../components/ProjectForm";
 import { UserInfo } from "../components/UserInfo";
@@ -10,36 +10,98 @@ export const ProjectsPage = () => {
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
     const [showForm, setShowForm] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const storedProjects = localStorageService.getProjects();
-        setProjects(storedProjects);
+        loadProjects();
     }, []);
 
-    const handleAddProject = (project: { name: string; description: string }) => {
-        const newProject: Project = { ...project, id: crypto.randomUUID() };
-        localStorageService.saveProjects([newProject]);
-        setProjects([...projects, newProject]);
-        setShowForm(false);
+    const loadProjects = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const projectsList = await ProjectService.getProjects();
+            setProjects(projectsList);
+        } catch (err) {
+            setError('Błąd podczas ładowania projektów');
+            console.error('Error loading projects:', err);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleEditProject = (project: Project) => {
-        localStorageService.saveProjects([project]);
-        setProjects(
-            projects.map((p) => (p.id === project.id ? project : p))
-        );
-        setSelectedProject(null);
+    const handleAddProject = async (project: { name: string; description: string }) => {
+        setLoading(true);
+        try {
+            const newProject: Project = { 
+                ...project, 
+                id: crypto.randomUUID() // Tymczasowe ID, zostanie zastąpione przez MongoDB
+            };
+            await ProjectService.saveProject(newProject);
+            await loadProjects(); // Przeładuj listę projektów
+            setShowForm(false);
+        } catch (err) {
+            setError('Błąd podczas dodawania projektu');
+            console.error('Error adding project:', err);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleDeleteProject = (id: string) => {
-        localStorageService.deleteProject(id);
-        setProjects(projects.filter((project) => project.id !== id));
+    const handleEditProject = async (project: Project) => {
+        setLoading(true);
+        try {
+            await ProjectService.saveProject(project);
+            await loadProjects();
+            setSelectedProject(null);
+        } catch (err) {
+            setError('Błąd podczas edycji projektu');
+            console.error('Error editing project:', err);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const filteredProjects = projects.filter(project =>
-        project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        project.description.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const handleDeleteProject = async (id: string) => {
+        if (!confirm('Czy na pewno chcesz usunąć ten projekt?')) return;
+        
+        setLoading(true);
+        try {
+            await ProjectService.deleteProject(id);
+            await loadProjects();
+        } catch (err) {
+            setError('Błąd podczas usuwania projektu');
+            console.error('Error deleting project:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSearch = async (term: string) => {
+        if (!term.trim()) {
+            await loadProjects();
+            return;
+        }
+        
+        setLoading(true);
+        try {
+            const searchResults = await ProjectService.searchProjects(term);
+            setProjects(searchResults);
+        } catch (err) {
+            setError('Błąd podczas wyszukiwania');
+            console.error('Error searching projects:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const filteredProjects = searchTerm 
+        ? projects.filter(project =>
+            project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            project.description.toLowerCase().includes(searchTerm.toLowerCase())
+          )
+        : projects;
 
     return (
         <div className="space-y-8">
@@ -56,53 +118,48 @@ export const ProjectsPage = () => {
                 <UserInfo />
             </div>
 
+            {/* Error Alert */}
+            {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative">
+                    <span className="block sm:inline">{error}</span>
+                    <button 
+                        onClick={() => setError(null)}
+                        className="absolute top-0 bottom-0 right-0 px-4 py-3"
+                    >
+                        ×
+                    </button>
+                </div>
+            )}
+
             {/* Actions bar */}
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                {/* Search */}
-                <div className="relative flex-1 max-w-md">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
+                <div className="flex-1 max-w-md">
                     <input
                         type="text"
                         placeholder="Szukaj projektów..."
                         value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="form-input pl-10"
+                        onChange={(e) => {
+                            setSearchTerm(e.target.value);
+                            handleSearch(e.target.value);
+                        }}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100"
+                        disabled={loading}
                     />
                 </div>
-
-                {/* Stats */}
-                <div className="flex items-center space-x-6 text-sm">
-                    <div className="flex items-center text-gray-500 dark:text-gray-400">
-                        <span className="font-medium text-gray-900 dark:text-gray-100">{projects.length}</span>
-                        <span className="ml-1">projektów</span>
-                    </div>
-                    <div className="flex items-center text-gray-500 dark:text-gray-400">
-                        <span className="font-medium text-green-600 dark:text-green-400">0</span>
-                        <span className="ml-1">aktywnych</span>
-                    </div>
-                </div>
-
-                {/* Add button */}
                 <button
                     onClick={() => setShowForm(true)}
-                    className="btn-primary"
+                    disabled={loading}
+                    className="btn-primary whitespace-nowrap"
                 >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Nowy projekt
+                    {loading ? 'Ładowanie...' : '+ Nowy projekt'}
                 </button>
             </div>
 
-            {/* Form */}
-            {(showForm || selectedProject) && (
-                <div className="animate-slide-up">
-                    <ProjectForm 
-                        onSubmit={selectedProject 
+            {/* Project form */}
+            {showForm && (
+                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <ProjectForm
+                        onSubmit={selectedProject
                             ? (project) => {
                                 if (selectedProject) {
                                     handleEditProject({ ...selectedProject, ...project });
@@ -119,65 +176,81 @@ export const ProjectsPage = () => {
                 </div>
             )}
 
-            {/* Projects list */}
-            <div className="space-y-6">
-                {searchTerm && (
-                    <div className="flex items-center justify-between">
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Znaleziono {filteredProjects.length} projekt{filteredProjects.length === 1 ? '' : filteredProjects.length < 5 ? 'y' : 'ów'} 
-                            {searchTerm && (
-                                <>
-                                    {' '}dla "{searchTerm}"
-                                </>
-                            )}
-                        </p>
-                        {searchTerm && (
-                            <button
-                                onClick={() => setSearchTerm("")}
-                                className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
-                            >
-                                Wyczyść
-                            </button>
-                        )}
-                    </div>
-                )}
+            {/* Loading indicator */}
+            {loading && (
+                <div className="text-center py-8">
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+                    <p className="mt-2 text-gray-600 dark:text-gray-400">Ładowanie...</p>
+                </div>
+            )}
 
-                {filteredProjects.length === 0 ? (
-                    <div className="text-center py-12">
-                        <div className="mx-auto h-24 w-24 text-gray-400 mb-4">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-full h-full">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                            </svg>
+            {/* Projects list */}
+            {!loading && (
+                <div className="space-y-6">
+                    {searchTerm && (
+                        <div className="flex items-center justify-between">
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                Znaleziono {filteredProjects.length} projekt{filteredProjects.length === 1 ? '' : filteredProjects.length < 5 ? 'y' : 'ów'} 
+                                {searchTerm && (
+                                    <>
+                                        {' '}dla "{searchTerm}"
+                                    </>
+                                )}
+                            </p>
+                            {searchTerm && (
+                                <button
+                                    onClick={() => {
+                                        setSearchTerm("");
+                                        loadProjects();
+                                    }}
+                                    className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
+                                >
+                                    Wyczyść
+                                </button>
+                            )}
                         </div>
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-                            {searchTerm ? 'Brak wyników' : 'Brak projektów'}
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-sm mx-auto">
-                            {searchTerm 
-                                ? `Nie znaleziono projektów pasujących do "${searchTerm}"`
-                                : 'Rozpocznij od utworzenia swojego pierwszego projektu'
-                            }
-                        </p>
-                        {!searchTerm && (
-                            <button
-                                onClick={() => setShowForm(true)}
-                                className="btn-primary"
-                            >
-                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    )}
+
+                    {filteredProjects.length === 0 ? (
+                        <div className="text-center py-12">
+                            <div className="mx-auto h-24 w-24 text-gray-400 mb-4">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" className="w-full h-full">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                 </svg>
-                                Utwórz pierwszy projekt
-                            </button>
-                        )}
-                    </div>
-                ) : (
-                    <ProjectList
-                        projects={filteredProjects}
-                        onEdit={(project) => setSelectedProject(project)}
-                        onDelete={handleDeleteProject}
-                    />
-                )}
-            </div>
+                            </div>
+                            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                                {searchTerm ? 'Brak wyników' : 'Brak projektów'}
+                            </h3>
+                            <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-sm mx-auto">
+                                {searchTerm 
+                                    ? `Nie znaleziono projektów pasujących do "${searchTerm}"`
+                                    : 'Rozpocznij od utworzenia swojego pierwszego projektu'
+                                }
+                            </p>
+                            {!searchTerm && (
+                                <button
+                                    onClick={() => setShowForm(true)}
+                                    className="btn-primary"
+                                >
+                                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    </svg>
+                                    Utwórz pierwszy projekt
+                                </button>
+                            )}
+                        </div>
+                    ) : (
+                        <ProjectList
+                            projects={filteredProjects}
+                            onEdit={(project) => {
+                                setSelectedProject(project);
+                                setShowForm(true);
+                            }}
+                            onDelete={handleDeleteProject}
+                        />
+                    )}
+                </div>
+            )}
         </div>
     );
 };

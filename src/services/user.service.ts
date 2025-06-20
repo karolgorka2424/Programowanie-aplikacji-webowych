@@ -1,13 +1,14 @@
 import { User, UserRole } from "../models/User";
+import MongoDBService from "./mongodb.service";
 import ApiService from "./api.service";
-
 
 class UserService {
     private static readonly CURRENT_USER_KEY = "currentUser";
     private static readonly USERS_KEY = "users";
     private static cachedUsers: User[] | null = null;
+    private static useLocalStorage = false;
     
-    // Mock użytkowników
+    // Mock użytkowników (fallback)
     private static mockUsers: User[] = [
         {
             id: "user-1",
@@ -43,45 +44,86 @@ class UserService {
 
     static async initializeUsers(): Promise<void> {
         try {
-            // Spróbuj pobrać użytkowników z API
-            const users = await ApiService.getAllUsers();
-            this.cachedUsers = users;
-            localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
-        } catch (error) {
-            // Jeśli API nie działa, użyj mock danych
-            console.warn('Nie można pobrać użytkowników z API, używam danych mock');
-            const existingUsers = localStorage.getItem(this.USERS_KEY);
-            if (!existingUsers) {
-                localStorage.setItem(this.USERS_KEY, JSON.stringify(this.mockUsers));
+            if (this.useLocalStorage) {
+                return this.initializeUsersFromLocalStorage();
             }
+            
+            // Spróbuj pobrać użytkowników z MongoDB
+            const users = await MongoDBService.getUsers();
+            this.cachedUsers = users.map(this.transformMongoUser);
+            localStorage.setItem(this.USERS_KEY, JSON.stringify(this.cachedUsers));
+        } catch (error) {
+            console.warn('Błąd MongoDB, używam localStorage jako fallback');
+            this.useLocalStorage = true;
+            return this.initializeUsersFromLocalStorage();
         }
     }
 
-    static getAllUsers(): User[] {
-        if (this.cachedUsers) {
+    static async getAllUsers(): Promise<User[]> {
+        try {
+            if (this.useLocalStorage) {
+                return this.getAllUsersFromLocalStorage();
+            }
+            
+            if (this.cachedUsers) {
+                return this.cachedUsers;
+            }
+            
+            const users = await MongoDBService.getUsers();
+            this.cachedUsers = users.map(this.transformMongoUser);
             return this.cachedUsers;
+        } catch (error) {
+            console.warn('Błąd MongoDB, używam localStorage jako fallback');
+            this.useLocalStorage = true;
+            return this.getAllUsersFromLocalStorage();
         }
-        const users = localStorage.getItem(this.USERS_KEY);
-        return users ? JSON.parse(users) : this.mockUsers;
     }
 
-    static getUserById(id: string): User | undefined {
-        return this.getAllUsers().find(user => user.id === id);
+    static async getUserById(id: string): Promise<User | undefined> {
+        try {
+            if (this.useLocalStorage) {
+                return this.getUserFromLocalStorage(id);
+            }
+            
+            const users = await this.getAllUsers();
+            return users.find(user => user.id === id);
+        } catch (error) {
+            console.warn('Błąd MongoDB, używam localStorage jako fallback');
+            return this.getUserFromLocalStorage(id);
+        }
     }
 
-    static getUsersByRole(role: UserRole): User[] {
-        return this.getAllUsers().filter(user => user.role === role);
+    static async getUsersByRole(role: UserRole): Promise<User[]> {
+        try {
+            if (this.useLocalStorage) {
+                return this.getUsersByRoleFromLocalStorage(role);
+            }
+            
+            const users = await this.getAllUsers();
+            return users.filter(user => user.role === role);
+        } catch (error) {
+            console.warn('Błąd MongoDB, używam localStorage jako fallback');
+            return this.getUsersByRoleFromLocalStorage(role);
+        }
     }
 
-    static getAssignableUsers(): User[] {
-        return this.getAllUsers().filter(user => 
-            user.role === 'developer' || user.role === 'devops'
-        );
+    static async getAssignableUsers(): Promise<User[]> {
+        try {
+            if (this.useLocalStorage) {
+                return this.getAssignableUsersFromLocalStorage();
+            }
+            
+            const users = await MongoDBService.getAssignableUsers();
+            return users.map(this.transformMongoUser);
+        } catch (error) {
+            console.warn('Błąd MongoDB, używam localStorage jako fallback');
+            return this.getAssignableUsersFromLocalStorage();
+        }
     }
 
     static async getCurrentUser(): Promise<User | null> {
         try {
-            // Spróbuj pobrać z API
+            // Spróbuj pobrać z API (autentykacja)
             if (ApiService.isAuthenticated()) {
                 const user = await ApiService.getCurrentUser();
                 this.setCurrentUser(user);
@@ -113,6 +155,62 @@ class UserService {
             localStorage.removeItem(this.CURRENT_USER_KEY);
             this.cachedUsers = null;
         }
+    }
+
+    // Metody pomocnicze
+    private static transformMongoUser(mongoUser: any): User {
+        return {
+            id: mongoUser._id.toString(),
+            firstName: mongoUser.firstName,
+            lastName: mongoUser.lastName,
+            role: mongoUser.role
+        };
+    }
+
+    // Metody fallback dla localStorage
+    private static initializeUsersFromLocalStorage(): void {
+        try {
+            // Spróbuj pobrać użytkowników z API
+            ApiService.getAllUsers().then(users => {
+                this.cachedUsers = users;
+                localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
+            }).catch(() => {
+                // Jeśli API nie działa, użyj mock danych
+                console.warn('Nie można pobrać użytkowników z API, używam danych mock');
+                const existingUsers = localStorage.getItem(this.USERS_KEY);
+                if (!existingUsers) {
+                    localStorage.setItem(this.USERS_KEY, JSON.stringify(this.mockUsers));
+                }
+            });
+        } catch (error) {
+            console.warn('Błąd podczas inicjalizacji użytkowników');
+        }
+    }
+
+    private static getAllUsersFromLocalStorage(): User[] {
+        // ✅ FIX: Obsługa null z cachedUsers
+        if (this.cachedUsers !== null) {
+            return this.cachedUsers;
+        }
+        const users = localStorage.getItem(this.USERS_KEY);
+        return users ? JSON.parse(users) : this.mockUsers;
+    }
+
+    private static getUserFromLocalStorage(id: string): User | undefined {
+        const users = this.getAllUsersFromLocalStorage();
+        return users.find(user => user.id === id);
+    }
+
+    private static getUsersByRoleFromLocalStorage(role: UserRole): User[] {
+        const users = this.getAllUsersFromLocalStorage();
+        return users.filter(user => user.role === role);
+    }
+
+    private static getAssignableUsersFromLocalStorage(): User[] {
+        const users = this.getAllUsersFromLocalStorage();
+        return users.filter(user => 
+            user.role === 'developer' || user.role === 'devops'
+        );
     }
 }
 
