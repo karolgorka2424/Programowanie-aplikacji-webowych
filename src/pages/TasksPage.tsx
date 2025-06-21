@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Task } from '../models/Task';
 import TaskService from '../services/task.service.ts';
-import ActiveProjectService from '../services/activeProject.service.ts';
 import { TaskForm } from '../components/TaskForm';
 import { TaskDetails } from '../components/TaskDetails';
 import { KanbanBoard } from '../components/KanbanBoard';

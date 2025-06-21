@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Story, Priority, StoryState } from '../models/Story';
 import UserService from '../services/user.service.ts';
 import ActiveProjectService from '../services/activeProject.service.ts';

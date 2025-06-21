@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Task, TaskPriority, TaskState } from '../models/Task';
+import { Task, TaskPriority } from '../models/Task';
 import { Story } from '../models/Story';
 import StoryService from '../services/story.service.ts';
 import ActiveProjectService from '../services/activeProject.service.ts';
