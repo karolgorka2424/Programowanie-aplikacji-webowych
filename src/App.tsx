@@ -6,6 +6,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { PrivateRoute } from "./components/PrivateRoute";
 import { ThemeProvider } from "./context/ThemeContext";
 import { ThemeToggle } from "./components/ThemeToggle";
+import { UserInfo } from "./components/UserInfo";
 import ApiService from "./services/api.service";
 
 function App() {
@@ -68,6 +69,7 @@ function App() {
                   {/* Prawa strona nagłówka */}
                   <div className="flex items-center space-x-4">
                     <ThemeToggle />
+                    <UserInfo />
                   </div>
                 </div>
 

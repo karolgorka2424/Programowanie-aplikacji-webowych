@@ -29,7 +29,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onSubmit, initialProject, onC
     };
 
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 animate-slide-up">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700" style={{animation: 'slideUp 0.3s ease-out'}}>
             <div className="p-6 pb-4 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center space-x-3">
                     <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">

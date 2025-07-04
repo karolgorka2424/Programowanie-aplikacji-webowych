@@ -198,7 +198,24 @@ app.get("/protected/:id/:delay?", verifyToken, (req, res) => {
   }, delay)
 })
 
-app.listen(port, () => {
+// Graceful shutdown handler
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully...')
+  server.close(() => {
+    console.log('Server closed')
+    process.exit(0)
+  })
+})
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully...')
+  server.close(() => {
+    console.log('Server closed')
+    process.exit(0)
+  })
+})
+
+const server = app.listen(port, () => {
   console.log(`ManagMe API listening on port ${port}`)
   console.log('\nDostępni użytkownicy (dla testów):')
   console.log('- admin / admin123')
@@ -206,6 +223,20 @@ app.listen(port, () => {
   console.log('- piotr.dev / dev123')
   console.log('- kasia.ops / ops123')
   console.log('- tomek.ops / ops123')
+})
+
+// Handle port already in use error
+server.on('error', (error: NodeJS.ErrnoException) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(`❌ Port ${port} is already in use!`)
+    console.error(`💡 Please check if another instance of the server is running.`)
+    console.error(`💡 You can kill the process using: lsof -ti:${port} | xargs kill -9`)
+    console.error(`💡 Or try using a different port by setting PORT environment variable.`)
+    process.exit(1)
+  } else {
+    console.error('Server error:', error)
+    process.exit(1)
+  }
 })
 
 function generateToken(userId: string, expirationInSeconds: number) {
