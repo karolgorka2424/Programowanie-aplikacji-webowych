@@ -7,7 +7,7 @@ import { PrivateRoute } from "./components/PrivateRoute";
 import { ThemeProvider } from "./context/ThemeContext";
 import { ThemeToggle } from "./components/ThemeToggle";
 import ApiService from "./services/api.service";
-import './App.css';
+import './index.css';
 
 function App() {
   const isAuthenticated = ApiService.isAuthenticated();
