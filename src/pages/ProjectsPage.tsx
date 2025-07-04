@@ -3,7 +3,6 @@ import { Project } from "../models/Project";
 import localStorageService from "../services/localStorage.service";
 import { ProjectList } from "../components/ProjectList";
 import ProjectForm from "../components/ProjectForm";
-import { UserInfo } from "../components/UserInfo";
 
 export const ProjectsPage = () => {
     const [projects, setProjects] = useState<Project[]>([]);
@@ -53,7 +52,6 @@ export const ProjectsPage = () => {
                         Zarządzaj swoimi projektami i ich postępem
                     </p>
                 </div>
-                <UserInfo />
             </div>
 
             {/* Actions bar */}
@@ -100,7 +98,7 @@ export const ProjectsPage = () => {
 
             {/* Form */}
             {(showForm || selectedProject) && (
-                <div className="animate-slide-up">
+                <div style={{animation: 'slideUp 0.3s ease-out'}}>
                     <ProjectForm 
                         onSubmit={selectedProject 
                             ? (project) => {

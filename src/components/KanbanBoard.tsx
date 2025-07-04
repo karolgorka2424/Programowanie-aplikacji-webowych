@@ -53,27 +53,29 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ onTaskClick }) => {
         return tasks.filter(task => task.state === state);
     };
 
-    const getPriorityClass = (priority: Task['priority']) => {
+    const getPriorityBorderClass = (priority: Task['priority']) => {
         switch (priority) {
-            case 'high': return 'priority-high';
-            case 'medium': return 'priority-medium';
-            case 'low': return 'priority-low';
-            default: return '';
+            case 'high': return 'border-l-red-500 dark:border-l-red-400';
+            case 'medium': return 'border-l-yellow-500 dark:border-l-yellow-400';
+            case 'low': return 'border-l-green-500 dark:border-l-green-400';
+            default: return 'border-l-gray-300 dark:border-l-gray-600';
         }
     };
 
     const renderTaskCard = (task: TaskWithDetails) => (
         <div 
             key={task.id} 
-            className={`kanban-task ${getPriorityClass(task.priority)}`}
+            className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer border-l-4 ${getPriorityBorderClass(task.priority)}`}
             onClick={() => onTaskClick(task)}
         >
-            <h4>{task.name}</h4>
-            <p className="task-story">{task.story?.name || 'Brak historyjki'}</p>
-            <div className="task-meta">
-                <span className="task-time">{task.estimatedTime}h</span>
+            <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2 line-clamp-2">{task.name}</h4>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 line-clamp-1">{task.story?.name || 'Brak historyjki'}</p>
+            <div className="flex justify-between items-center text-xs">
+                <span className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 px-2 py-1 rounded-md">
+                    {task.estimatedTime}h
+                </span>
                 {task.assignedUser && (
-                    <span className="task-user">
+                    <span className="text-blue-600 dark:text-blue-400 font-medium">
                         {task.assignedUser.firstName} {task.assignedUser.lastName[0]}.
                     </span>
                 )}
@@ -84,15 +86,31 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ onTaskClick }) => {
     const renderColumn = (state: TaskState, title: string) => {
         const columnTasks = getTasksByState(state);
         
+        const getColumnHeaderClass = () => {
+            switch (state) {
+                case 'todo': return 'text-gray-600 dark:text-gray-400';
+                case 'doing': return 'text-blue-600 dark:text-blue-400';
+                case 'done': return 'text-green-600 dark:text-green-400';
+                default: return 'text-gray-600 dark:text-gray-400';
+            }
+        };
+        
         return (
-            <div className="kanban-column">
-                <div className="kanban-column-header">
-                    <h3>{title}</h3>
-                    <span className="task-count">{columnTasks.length}</span>
+            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 min-h-[500px] flex flex-col">
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className={`text-lg font-semibold ${getColumnHeaderClass()}`}>{title}</h3>
+                    <span className="bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs px-2 py-1 rounded-full">
+                        {columnTasks.length}
+                    </span>
                 </div>
-                <div className="kanban-column-content">
+                <div className="flex-1 space-y-3">
                     {columnTasks.length === 0 ? (
-                        <p className="empty-column">Brak zadań</p>
+                        <div className="text-center py-8">
+                            <svg className="mx-auto h-8 w-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Brak zadań</p>
+                        </div>
                     ) : (
                         columnTasks.map(task => renderTaskCard(task))
                     )}
@@ -103,14 +121,17 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({ onTaskClick }) => {
 
     if (!activeProjectId) {
         return (
-            <div className="kanban-no-project">
-                <p>Wybierz projekt, aby zobaczyć tablicę Kanban</p>
+            <div className="text-center py-16">
+                <svg className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                <p className="mt-2 text-lg text-gray-600 dark:text-gray-400">Wybierz projekt, aby zobaczyć tablicę Kanban</p>
             </div>
         );
     }
 
     return (
-        <div className="kanban-board">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {renderColumn('todo', 'Do zrobienia')}
             {renderColumn('doing', 'W trakcie')}
             {renderColumn('done', 'Zakończone')}

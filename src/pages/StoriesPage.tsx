@@ -6,7 +6,6 @@ import LocalStorageService from '../services/localStorage.service';
 import { StoryForm } from '../components/StoryForm';
 import { StoryList } from '../components/StoryList';
 import { ProjectSelector } from '../components/ProjectSelector';
-import { UserInfo } from '../components/UserInfo';
 
 export const StoriesPage = () => {
     const [stories, setStories] = useState<Story[]>([]);
@@ -80,7 +79,6 @@ export const StoriesPage = () => {
                         Zarządzaj historyjkami użytkownika w projekcie
                     </p>
                 </div>
-                <UserInfo />
             </div>
             
             <ProjectSelector onProjectChange={handleProjectChange} />
