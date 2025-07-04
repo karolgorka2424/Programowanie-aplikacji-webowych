@@ -4,9 +4,26 @@ import { useTheme } from '../context/ThemeContext';
 export const ThemeToggle: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
 
+  const handleClick = () => {
+    console.log('Przed zmianą:');
+    console.log('- theme:', theme);
+    console.log('- localStorage theme:', localStorage.getItem('theme'));
+    console.log('- dark class na html:', document.documentElement.classList.contains('dark'));
+    
+    toggleTheme();
+    
+    // Sprawdź po małym opóźnieniu
+    setTimeout(() => {
+      console.log('Po zmianie:');
+      console.log('- theme:', theme);
+      console.log('- localStorage theme:', localStorage.getItem('theme'));
+      console.log('- dark class na html:', document.documentElement.classList.contains('dark'));
+    }, 100);
+  };
+
   return (
     <button
-      onClick={toggleTheme}
+      onClick={handleClick}
       className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
       aria-label={`Przełącz na ${theme === 'light' ? 'ciemny' : 'jasny'} motyw`}
     >

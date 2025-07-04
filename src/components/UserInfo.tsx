@@ -45,7 +45,8 @@ export const UserInfo = () => {
         }
     };
 
-    const getInitials = (username: string) => {
+    const getInitials = (username?: string) => {
+        if (!username) return '';
         return username
             .split(' ')
             .map(name => name.charAt(0))
@@ -53,6 +54,7 @@ export const UserInfo = () => {
             .toUpperCase()
             .slice(0, 2);
     };
+
 
     const getRoleDisplayName = (role: string) => {
         const roleMap: { [key: string]: string } = {
@@ -106,7 +108,7 @@ export const UserInfo = () => {
                         {getInitials(user.username)}
                     </span>
                 </div>
-                
+
                 {/* User details */}
                 <div className="hidden sm:block text-left">
                     <div className="text-sm font-medium text-gray-900 dark:text-white">
@@ -118,10 +120,10 @@ export const UserInfo = () => {
                 </div>
 
                 {/* Dropdown arrow */}
-                <svg 
-                    className={`w-4 h-4 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} 
-                    fill="none" 
-                    stroke="currentColor" 
+                <svg
+                    className={`w-4 h-4 text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                 >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -153,7 +155,7 @@ export const UserInfo = () => {
                                 </div>
                             </div>
                         </div>
-                        
+
                         {/* Menu items */}
                         <div className="py-2">
                             <button
@@ -176,7 +178,7 @@ export const UserInfo = () => {
                                 Ustawienia
                             </button>
                         </div>
-                        
+
                         {/* Logout */}
                         <div className="border-t border-gray-200 dark:border-gray-700 py-2">
                             <button
@@ -195,8 +197,8 @@ export const UserInfo = () => {
 
             {/* Click outside to close */}
             {isDropdownOpen && (
-                <div 
-                    className="fixed inset-0 z-10" 
+                <div
+                    className="fixed inset-0 z-10"
                     onClick={() => setIsDropdownOpen(false)}
                 ></div>
             )}

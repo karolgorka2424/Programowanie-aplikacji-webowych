@@ -7,7 +7,6 @@ import { PrivateRoute } from "./components/PrivateRoute";
 import { ThemeProvider } from "./context/ThemeContext";
 import { ThemeToggle } from "./components/ThemeToggle";
 import ApiService from "./services/api.service";
-import './index.css';
 
 function App() {
   const isAuthenticated = ApiService.isAuthenticated();
@@ -36,52 +35,51 @@ function App() {
                       <NavLink 
                         to="/" 
                         className={({ isActive }) => 
-                          `nav-link ${isActive ? 'nav-link-active' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'}`
+                          isActive 
+                            ? 'flex items-center px-3 py-2 text-sm font-medium rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                            : 'flex items-center px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300'
                         }
                       >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                        </svg>
                         Projekty
                       </NavLink>
                       <NavLink 
                         to="/stories" 
                         className={({ isActive }) => 
-                          `nav-link ${isActive ? 'nav-link-active' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'}`
+                          isActive 
+                            ? 'flex items-center px-3 py-2 text-sm font-medium rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                            : 'flex items-center px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300'
                         }
                       >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                        </svg>
                         Historyjki
                       </NavLink>
                       <NavLink 
                         to="/tasks" 
                         className={({ isActive }) => 
-                          `nav-link ${isActive ? 'nav-link-active' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'}`
+                          isActive 
+                            ? 'flex items-center px-3 py-2 text-sm font-medium rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                            : 'flex items-center px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300'
                         }
                       >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
-                        </svg>
                         Zadania
                       </NavLink>
                     </nav>
                   </div>
 
-                  {/* Przełącznik motywu */}
+                  {/* Prawa strona nagłówka */}
                   <div className="flex items-center space-x-4">
                     <ThemeToggle />
                   </div>
                 </div>
-                
-                {/* Mobilna nawigacja */}
-                <nav className="md:hidden py-4 border-t border-gray-200 dark:border-gray-700">
-                  <div className="flex space-x-1">
+
+                {/* Nawigacja mobilna */}
+                <nav className="md:hidden px-4 pb-4">
+                  <div className="flex space-x-2">
                     <NavLink 
                       to="/" 
                       className={({ isActive }) => 
-                        isActive ? 'nav-link-active text-xs' : 'nav-link text-gray-600 dark:text-gray-300 text-xs'
+                        isActive 
+                          ? 'flex items-center px-3 py-2 text-xs font-medium rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                          : 'flex items-center px-3 py-2 text-xs font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300'
                       }
                     >
                       Projekty
@@ -89,7 +87,9 @@ function App() {
                     <NavLink 
                       to="/stories" 
                       className={({ isActive }) => 
-                        isActive ? 'nav-link-active text-xs' : 'nav-link text-gray-600 dark:text-gray-300 text-xs'
+                        isActive 
+                          ? 'flex items-center px-3 py-2 text-xs font-medium rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                          : 'flex items-center px-3 py-2 text-xs font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300'
                       }
                     >
                       Historyjki
@@ -97,7 +97,9 @@ function App() {
                     <NavLink 
                       to="/tasks" 
                       className={({ isActive }) => 
-                        isActive ? 'nav-link-active text-xs' : 'nav-link text-gray-600 dark:text-gray-300 text-xs'
+                        isActive 
+                          ? 'flex items-center px-3 py-2 text-xs font-medium rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                          : 'flex items-center px-3 py-2 text-xs font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300'
                       }
                     >
                       Zadania
