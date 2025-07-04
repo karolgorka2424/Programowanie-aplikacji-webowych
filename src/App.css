@@ -1,0 +1,46 @@
+/* App.css - Legacy styles that don't conflict with Tailwind dark mode */
+
+/* Keep only necessary legacy styles that don't override form elements */
+
+/* Loading states and animations that complement Tailwind */
+.story-item:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Keep priority indicators as they complement the design */
+.story-item.priority-high {
+  border-left: 4px solid #dc3545;
+}
+
+.story-item.priority-medium {
+  border-left: 4px solid #ffc107;
+}
+
+.story-item.priority-low {
+  border-left: 4px solid #28a745;
+}
+
+/* Keep specific task state styles that complement Tailwind */
+.state-todo {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.state-doing {
+  background-color: #cfe2ff;
+  color: #084298;
+}
+
+.state-done {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+/* Remove all form styling that conflicts with Tailwind dark mode
+   - Removed generic form, input, select, textarea styles
+   - Removed label styles
+   - Removed button styles
+   - Removed all layout styles that use fixed colors
+   
+   These have been replaced with proper Tailwind classes in the components
+*/

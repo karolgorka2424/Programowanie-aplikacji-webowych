@@ -1,4 +1,5 @@
 import { Task, TaskState } from "../models/Task";
+import StoryService from "./story.service";
 
 class TaskService {
     private static readonly TASKS_KEY = "tasks";
@@ -63,7 +64,6 @@ class TaskService {
     }
 
     static getTasksByProjectId(projectId: string): Task[] {
-        const StoryService = require('./story.service').default;
         const projectStories = StoryService.getStoriesByProjectId(projectId);
         const storyIds = projectStories.map((story: { id: string }) => story.id);
         
