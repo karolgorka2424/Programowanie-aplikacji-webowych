@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ApiService from '../services/api.service';
 import UserService from '../services/user.service';
-import { ThemeSwitcher } from './ThemeSwitcher';
+import { ThemeToggle } from './ThemeToggle';
 
 export const LoginForm: React.FC = () => {
     const [login, setLogin] = useState('');
@@ -61,7 +61,7 @@ export const LoginForm: React.FC = () => {
 
                 {/* Theme switcher */}
                 <div className="flex justify-center">
-                    <ThemeSwitcher />
+                    <ThemeToggle />
                 </div>
 
                 {/* Login form */}

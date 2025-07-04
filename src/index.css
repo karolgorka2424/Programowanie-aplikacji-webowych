@@ -1,1 +1,65 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+     @apply tw:bg-gray-50 tw:dark:bg-gray-900 tw:text-gray-900 tw:dark:text-gray-100 tw:transition-colors tw:duration-300;
+  }
+}
+
+@layer components {
+  /* Przyciski */
+.btn {
+  @apply tw:inline-flex tw:items-center tw:justify-center tw:rounded-lg tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:transition-all tw:duration-200 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-offset-2 tw:disabled:opacity-50 tw:disabled:cursor-not-allowed;
+}
+
+.btn-primary {
+  @apply btn tw:bg-blue-600 tw:text-white hover:tw:bg-blue-700 tw:focus:ring-blue-500 tw:shadow-lg hover:tw:shadow-xl;
+}
+
+.btn-secondary {
+  @apply btn tw:bg-gray-200 tw:text-gray-900 hover:tw:bg-gray-300 tw:focus:ring-gray-500 dark:tw:bg-gray-700 dark:tw:text-gray-100 dark:hover:tw:bg-gray-600;
+}
+
+.card {
+  @apply tw:bg-white dark:tw:bg-gray-800 tw:rounded-xl tw:shadow-lg tw:border tw:border-gray-200 dark:tw:border-gray-700 tw:transition-all tw:duration-200;
+}
+
+.card-body {
+  @apply tw:px-6 tw:py-4;
+}
+
+.card-header {
+  @apply tw:px-6 tw:py-4 tw:border-b tw:border-gray-200 dark:tw:border-gray-700;
+}
+
+.form-group {
+  @apply tw:mb-6;
+}
+
+.form-label {
+  @apply tw:block tw:text-sm tw:font-medium tw:text-gray-700 dark:tw:text-gray-300 tw:mb-2;
+}
+
+.form-input {
+  @apply tw:w-full tw:px-3 tw:py-2 tw:border tw:border-gray-300 dark:tw:border-gray-600 tw:rounded-lg tw:shadow-sm tw:placeholder-gray-400 dark:tw:placeholder-gray-500 tw:bg-white dark:tw:bg-gray-700 tw:text-gray-900 dark:tw:text-gray-100 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-blue-500 tw:focus:border-blue-500 tw:transition-colors tw:duration-200;
+}
+
+.nav-link {
+  @apply tw:flex tw:items-center tw:px-4 tw:py-2 tw:text-sm tw:font-medium tw:rounded-lg tw:transition-all tw:duration-200 hover:tw:bg-gray-100 dark:hover:tw:bg-gray-700;
+}
+
+.nav-link-active {
+  @apply nav-link tw:bg-blue-100 dark:tw:bg-blue-900 tw:text-blue-700 dark:tw:text-blue-300;
+}
+}

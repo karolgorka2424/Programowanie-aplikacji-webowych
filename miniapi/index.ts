@@ -110,7 +110,7 @@ app.post('/api/auth/login', async (req, res) => {
 
   // Zwróć odpowiedź
   const { password: _, ...userWithoutPassword } = user
-  res.json({
+  return res.json({  // DODAJ return tutaj
     token,
     refreshToken,
     user: userWithoutPassword
@@ -137,7 +137,7 @@ app.post('/api/auth/refresh', (req, res) => {
     // Generuj nowy access token
     const newToken = generateToken(decoded.userId, 15 * 60) // 15 minut
     
-    res.json({ token: newToken })
+    return res.json({ token: newToken })  // DODAJ return tutaj
   } catch (err) {
     return res.status(403).json({ error: 'Nieprawidłowy refresh token' })
   }
@@ -163,7 +163,7 @@ app.get('/api/auth/me', verifyToken, (req: any, res) => {
   }
 
   const { password, ...userWithoutPassword } = user
-  res.json(userWithoutPassword)
+  return res.json(userWithoutPassword)
 })
 
 // Endpoint pobierania wszystkich użytkowników (chroniony)
