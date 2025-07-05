@@ -4,8 +4,8 @@ import { StoriesPage } from "./pages/StoriesPage";
 import { TasksPage } from "./pages/TasksPage";
 import { LoginPage } from "./pages/LoginPage";
 import { PrivateRoute } from "./components/PrivateRoute";
-import { ThemeProvider } from "./context/ThemeContext";
-import { ThemeToggle } from "./components/ThemeToggle";
+import { ThemeProvider } from "./context/ThemeProvider";
+import { ThemeToggle } from "./components/ThemeSwitcher";
 import { UserInfo } from "./components/UserInfo";
 import ApiService from "./services/api.service";
 
