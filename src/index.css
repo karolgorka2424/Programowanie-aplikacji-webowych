@@ -2,18 +2,50 @@
 
 @import 'tailwindcss';
 
-/* Globalne style */
-:root {
-  font-family: 'Inter', system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Global styles with dark mode support */
+body {
+  background-color: #f9fafb; /* bg-gray-50 */
+  color: #111827; /* text-gray-900 */
+  transition: background-color 0.3s, color 0.3s;
 }
 
-/* Reset dla body */
-body {
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
+.dark body {
+  background-color: #111827; /* dark:bg-gray-900 */
+  color: #f9fafb; /* dark:text-gray-100 */
+}
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  /* Basic component styles without @apply for compatibility */
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(156 163 175) transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgb(156 163 175);
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(107 114 128);
+  }
 }
 
 /* Globalne style dla elementów formularzy */
