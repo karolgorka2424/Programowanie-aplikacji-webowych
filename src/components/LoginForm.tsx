@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ApiService from '../services/api.service';
 import UserService from '../services/user.service';
-import { ThemeToggle } from './ThemeToggle';
+import { ThemeToggle } from './ThemeSwitcher';
 
 export const LoginForm: React.FC = () => {
     const [login, setLogin] = useState('');
